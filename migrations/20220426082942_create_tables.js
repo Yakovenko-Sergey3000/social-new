@@ -13,6 +13,9 @@ exports.up = (knex) => {
         .notNullable()
       t.string("password")
         .notNullable()
+      t.timestamp("createAt")
+      t.timestamp("updateAt")
+      t.timestamp("deleteAt")
     })
     .createTable("roles", (t) => {
       t.string("role_name")
