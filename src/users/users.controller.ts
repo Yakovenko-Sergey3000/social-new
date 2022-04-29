@@ -13,7 +13,7 @@ export class UsersController {
   @ApiOperation({summary: "Получить всех пользователей"})
   @Get()
   async allUsers() {
-    return await this.userService.allUsers()
+    return await this.userService.allUsers();
   };
 
   @ApiOperation({summary: "Получить пользователя по id"})
@@ -40,7 +40,7 @@ export class UsersController {
   @ApiBody({ type: [Number] })
   async deletUsers(@Body() deleteUsersDto: DeleteUsersDto[]) {
     return this.userService.deleteUsers(deleteUsersDto)
-  }
+  };
 
   @ApiOperation({summary: "Изменить пользователей по id"})
   @Post("updateUser")  
