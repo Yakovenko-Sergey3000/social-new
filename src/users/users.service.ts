@@ -5,6 +5,7 @@ import { Knex } from 'nestjs-knex';
 import { CreateUserDTO } from 'src/dto/create-user.dto';
 import { userRoles } from "@/enums";
 import { DeleteUsersDto } from 'src/dto/delete-users.dto';
+import { UpdateUserDto } from 'src/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -45,6 +46,18 @@ export class UsersService {
         .update({ updateAt: date, deleteAt: date})
       
       return new HttpException("Удаление прошло успешно", HttpStatus.OK);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  };
+
+  async updateUser({id, params}: UpdateUserDto) {
+    try {
+      return await this.knex("users")
+        .where("id", id)
+        .whereNull("deleteAt")
+        .update({...params, updateAt: new Date()})
+        .returning(["id", "name", "email"])
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
