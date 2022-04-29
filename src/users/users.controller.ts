@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDTO } from 'src/dto/create-user.dto';
 import { DeleteUsersDto } from 'src/dto/delete-users.dto';
 import { UsersService } from './users.service';
@@ -8,6 +8,7 @@ import { UsersService } from './users.service';
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
+
   @ApiOperation({summary: "Получить всех пользователей"})
   @Get()
   async allUsers() {
@@ -33,14 +34,10 @@ export class UsersController {
     return await this.userService.createUser(createUserDTO, "admin");
   };
 
-  @ApiOperation({summary: "Удалить пользователя по id"})
-  @ApiProperty({
-    description: "Массив ids пользователей"
-  })
-
-
-  @Post("delete")  
-  async deletUsers(@Body() ids: DeleteUsersDto[]) {
-    return this.userService.deleteUsers(ids)
+  @ApiOperation({summary: "Удалить пользователей по id"})
+  @Post("deleteUsers")  
+  @ApiBody({ type: [Number] })
+  async deletUsers(@Body() deleteUsersDto: DeleteUsersDto[]) {
+    return this.userService.deleteUsers(deleteUsersDto)
   }
 }

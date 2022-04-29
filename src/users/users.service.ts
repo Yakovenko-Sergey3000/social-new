@@ -39,7 +39,7 @@ export class UsersService {
   async deleteUsers(ids: DeleteUsersDto[]) {
     try {
       const date = new Date();
-      const t = await this.knex("users")
+      await this.knex("users")
         .whereIn("id", ids)
         .whereNull("deleteAt")
         .update({ updateAt: date, deleteAt: date})
