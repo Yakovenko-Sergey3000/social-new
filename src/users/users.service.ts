@@ -4,6 +4,7 @@ import { InjectModel } from 'nest-knexjs';
 import { Knex } from 'nestjs-knex';
 import { CreateUserDTO } from 'src/dto/create-user.dto';
 import { userRoles } from "@/enums";
+import { DeleteUsersDto } from 'src/dto/delete-users.dto';
 
 @Injectable()
 export class UsersService {
@@ -33,5 +34,19 @@ export class UsersService {
     return await this.knex("users").select(["id", "name", "email"])
       .where({id})
       .first()
-  }
+  };
+
+  async deleteUsers(ids: DeleteUsersDto[]) {
+    try {
+      const date = new Date();
+      const t = await this.knex("users")
+        .whereIn("id", ids)
+        .whereNull("deleteAt")
+        .update({ updateAt: date, deleteAt: date})
+      
+      return new HttpException("Удаление прошло успешно", HttpStatus.OK);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  };
 };

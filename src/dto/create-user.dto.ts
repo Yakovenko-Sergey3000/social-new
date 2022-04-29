@@ -1,4 +1,4 @@
-import { ApiExtension, ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsEmail, MinLength } from 'class-validator'
 
 export class CreateUserDTO {
