@@ -2,13 +2,10 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsInt, IsNotEmpty } from "class-validator";
 
 export class AddInFriendsDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: "Id пользователя которого хотя добавить в друзья"
+  })
   @IsInt()
   @IsNotEmpty()
-  userOne: number;
-
-  @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
-  userTwo: number
+  userId: number
 }

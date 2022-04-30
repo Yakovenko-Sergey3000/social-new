@@ -1,5 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Param, Post } from '@nestjs/common';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { AddInFriendsDto } from 'src/dto/add-in-friend.dto';
 import { FriendshipService } from './friendship.service';
 
@@ -8,9 +8,9 @@ import { FriendshipService } from './friendship.service';
 export class FriendshipController {
     constructor(private readonly friendshipService: FriendshipService){};
 
-  
-  @Post("addInFriends")
-  async addInFriends(@Body() data: AddInFriendsDto) {
-     return this.friendshipService.addInFriends(data)
+  @Post("addInFriends/:id")
+  @ApiParam({name: "id", description: "Id пользователя который хочет добавить к себе в друзья"})
+  async addInFriends(@Param() param: { id: number }, @Body()  data: AddInFriendsDto) {
+    return this.friendshipService.addInFriends(Number(param.id), data.userId)
   };
 }

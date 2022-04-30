@@ -3,23 +3,25 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from 'nest-knexjs';
 import { Knex } from 'nestjs-knex';
-import { AddInFriendsDto } from 'src/dto/add-in-friend.dto';
 
 @Injectable()
 export class FriendshipService {
   constructor(@InjectModel() private knex: Knex){};
 
-  async addInFriends({userOne, userTwo}: AddInFriendsDto) {
+  async addInFriends(userOne: number, userTwo : number) {
     try {
-      const candidate = await this.isFriendship(userOne, userTwo);
-      if ( candidate.length ) {
+      const status = await this.isFriendship(userOne, userTwo);
+
+      if ( status === statusFriends.ADDED ) {
         return new HttpException("Пользователь у вас в друзьях", HttpStatus.BAD_REQUEST);
+      } else if ( status === statusFriends.FOLLOWER ) {
+        return new HttpException("Заявка уже отправлена", HttpStatus.BAD_REQUEST);
       }
       
       await this.knex("friendship").insert({
         user_one: userOne,
         user_two: userTwo
-      })
+      });
 
      return new HttpException("Запрос отправлен", HttpStatus.OK);
     } catch (e) {
@@ -28,13 +30,18 @@ export class FriendshipService {
   };
 
   async isFriendship(oneId: number, twoId: number) {
-    return await this.knex("users as u")
+    const res = await this.knex("users as u")
       .leftJoin("friendship as f", "u.id", "f.user_one")
-      .where({ "f.status": 1, "u.id": oneId , "f.user_two": twoId })
+      .where({ "f.status": statusFriends.ADDED, "u.id": oneId , "f.user_two": twoId })
+      .orWhere({"f.status": statusFriends.FOLLOWER, "u.id": oneId , "f.user_two": twoId })
       .union(
         this.knex("users as u")
           .leftJoin("friendship as f", "u.id", "f.user_two")
-          .where({"f.status": 1, "u.id": oneId, "f.user_one": twoId })
+          .where({"f.status": statusFriends.ADDED, "u.id": oneId, "f.user_one": twoId })
+          .orWhere({"f.status": statusFriends.FOLLOWER, "u.id": oneId , "f.user_two": twoId })
       )
+      .first()
+
+    return res.status
   };
-}
+};
