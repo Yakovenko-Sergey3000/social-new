@@ -10,11 +10,11 @@ export class FriendshipService {
 
   async addInFriends(userOne: number, userTwo : number) {
     try {
-      const status = await this.isFriendship(userOne, userTwo);
+      const friendship = await this.isFriendship(userOne, userTwo);
 
-      if ( status === statusFriends.ADDED ) {
+      if ( friendship.status === statusFriends.ADDED ) {
         return new HttpException("Пользователь у вас в друзьях", HttpStatus.BAD_REQUEST);
-      } else if ( status === statusFriends.FOLLOWER ) {
+      } else if ( friendship.status === statusFriends.FOLLOWER ) {
         return new HttpException("Заявка уже отправлена", HttpStatus.BAD_REQUEST);
       }
       
