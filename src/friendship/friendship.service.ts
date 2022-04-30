@@ -29,19 +29,43 @@ export class FriendshipService {
     }
   };
 
-  async isFriendship(oneId: number, twoId: number) {
-    const res = await this.knex("users as u")
-      .leftJoin("friendship as f", "u.id", "f.user_one")
-      .where({ "f.status": statusFriends.ADDED, "u.id": oneId , "f.user_two": twoId })
-      .orWhere({"f.status": statusFriends.FOLLOWER, "u.id": oneId , "f.user_two": twoId })
-      .union(
-        this.knex("users as u")
-          .leftJoin("friendship as f", "u.id", "f.user_two")
-          .where({"f.status": statusFriends.ADDED, "u.id": oneId, "f.user_one": twoId })
-          .orWhere({"f.status": statusFriends.FOLLOWER, "u.id": oneId , "f.user_two": twoId })
-      )
-      .first()
+  async deleteFromFriends(userOne: number, userTwo : number) {
+    try {
+      const friendship = await this.isFriendship(userOne, userTwo)
+      
+      if (!friendship) {
+        return new HttpException("Пользователь не добавлен в друзья", HttpStatus.BAD_REQUEST);
+      }
+      
+      await this.knex("friendship")
+        .update({
+          status: statusFriends.REJECT,
+          deleteAt: new Date()
+        })
 
-    return res.status
+      return new HttpException("Пользователь удален", HttpStatus.OK);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  };
+
+  async isFriendship(oneId: number, twoId: number) {
+    // const res = await this.knex("users as u")
+      // .leftJoin("friendship as f", "u.id", "f.user_one")
+      // .where({ "f.status": statusFriends.ADDED, "u.id": oneId , "f.user_two": twoId })
+      // .orWhere({"f.status": statusFriends.FOLLOWER, "u.id": oneId , "f.user_two": twoId })
+      // .union(
+      //   this.knex("users as u")
+      //     .leftJoin("friendship as f", "u.id", "f.user_two")
+      //     .where({"f.status": statusFriends.ADDED, "u.id": oneId, "f.user_one": twoId })
+      //     .orWhere({"f.status": statusFriends.FOLLOWER, "u.id": oneId , "f.user_two": twoId })
+      // )
+      // .first()
+    return await this.knex("friendship")
+      .where({"user_one": oneId,"user_two": twoId })
+      .whereNot("status", statusFriends.REJECT)
+      .orWhere({"user_one": twoId,"user_two": oneId })
+      .whereNot("status", statusFriends.REJECT)
+      .first()
   };
 };
