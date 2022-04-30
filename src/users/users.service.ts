@@ -4,7 +4,6 @@ import { InjectModel } from 'nest-knexjs';
 import { Knex } from 'nestjs-knex';
 import { CreateUserDTO } from 'src/dto/create-user.dto';
 import { userRoles } from "@/enums";
-import { DeleteUsersDto } from 'src/dto/delete-users.dto';
 import { UpdateUserDto } from 'src/dto/update-user.dto';
 
 @Injectable()
@@ -37,7 +36,7 @@ export class UsersService {
       .first()
   };
 
-  async deleteUsers(ids: DeleteUsersDto[]) {
+  async deleteUsers(ids: [Number]) {
     try {
       const date = new Date();
       await this.knex("users")
