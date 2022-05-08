@@ -12,6 +12,10 @@ async function App() {
     .setVersion("1.0.0")
     .build()
 
+  app.enableCors({
+    origin: true
+  })
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api/dock", app, document);
   await app.listen(PORT, () => console.log(`server starting on port: ${PORT}`));
