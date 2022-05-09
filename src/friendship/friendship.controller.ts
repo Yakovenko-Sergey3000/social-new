@@ -1,4 +1,5 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { statusFriends } from '@/enums';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiParam, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { FriendshipDto } from 'src/dto/friendship.dto';
 import { FriendshipService } from './friendship.service';
@@ -20,5 +21,19 @@ export class FriendshipController {
   @ApiParam({name: "id", description: "Id пользователя который хочет удалить друга"})
   async deleteFromFriends(@Param() param: { id: number }, @Body() data: FriendshipDto) {
     return this.friendshipService.deleteFromFriends(Number(param.id), data.userId)
+  };
+
+  @Get("getFriends/:id")
+  @ApiOperation({summary: "Запросить друзей пользователя"})
+  @ApiParam({name: "id", description: "Id пользователя"})
+  async getFriends(@Param() params: { id: number }) {
+    return this.friendshipService.getFriends(params.id)
+  };
+
+  @Get("getFollowers/:id")
+  @ApiOperation({summary: "Запросы в друзья пользователя"})
+  @ApiParam({name: "id", description: "Id пользователя"})
+  async getFollovers(@Param() params: { id: number }) {
+    return this.friendshipService.getFollowers(params.id)
   };
 }

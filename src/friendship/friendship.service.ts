@@ -49,18 +49,27 @@ export class FriendshipService {
     }
   };
 
+  async getFriends(id: number) {
+    return await this.knex("friendship as f")
+      .leftJoin("users as u", "f.user_two", "u.id")
+      .where({"f.user_one" : id , "f.status": statusFriends.ADDED })
+      .select(["u.id", "u.name", "u.email"])
+      .union(
+        this.knex("friendship as f")
+        .leftJoin("users as u", "f.user_one", "u.id")
+        .where({"f.user_two" : id , "f.status": statusFriends.ADDED })
+        .select(["u.id", "u.name", "u.email"])
+      )
+  };
+
+  async getFollowers(id: number) {
+    return await this.knex("friendship as f")
+      .leftJoin("users as u", "f.user_one", "u.id")
+      .where({"f.user_two" : id , "f.status": statusFriends.FOLLOWER })
+      .select(["u.id", "u.name", "u.email"])
+  };
+
   async isFriendship(oneId: number, twoId: number) {
-    // const res = await this.knex("users as u")
-      // .leftJoin("friendship as f", "u.id", "f.user_one")
-      // .where({ "f.status": statusFriends.ADDED, "u.id": oneId , "f.user_two": twoId })
-      // .orWhere({"f.status": statusFriends.FOLLOWER, "u.id": oneId , "f.user_two": twoId })
-      // .union(
-      //   this.knex("users as u")
-      //     .leftJoin("friendship as f", "u.id", "f.user_two")
-      //     .where({"f.status": statusFriends.ADDED, "u.id": oneId, "f.user_one": twoId })
-      //     .orWhere({"f.status": statusFriends.FOLLOWER, "u.id": oneId , "f.user_two": twoId })
-      // )
-      // .first()
     return await this.knex("friendship")
       .where({"user_one": oneId,"user_two": twoId })
       .whereNot("status", statusFriends.REJECT)
