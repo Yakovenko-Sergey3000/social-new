@@ -50,6 +50,7 @@ export class FriendshipService {
   };
 
   async getFriends(id: number) {
+   try {
     return await this.knex("friendship as f")
       .leftJoin("users as u", "f.user_two", "u.id")
       .where({"f.user_one" : id , "f.status": statusFriends.ADDED })
@@ -60,13 +61,20 @@ export class FriendshipService {
         .where({"f.user_two" : id , "f.status": statusFriends.ADDED })
         .select(["u.id", "u.name", "u.email"])
       )
+   } catch (e) {
+    throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+   }
   };
 
   async getFollowers(id: number) {
-    return await this.knex("friendship as f")
-      .leftJoin("users as u", "f.user_one", "u.id")
-      .where({"f.user_two" : id , "f.status": statusFriends.FOLLOWER })
-      .select(["u.id", "u.name", "u.email"])
+    try {
+      return await this.knex("friendship as f")
+        .leftJoin("users as u", "f.user_one", "u.id")
+        .where({"f.user_two" : id , "f.status": statusFriends.FOLLOWER })
+        .select(["u.id", "u.name", "u.email"])
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   };
 
   async isFriendship(oneId: number, twoId: number) {
